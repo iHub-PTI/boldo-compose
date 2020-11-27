@@ -1,0 +1,66 @@
+version: '3'
+
+services:
+  boldo-web:
+    build: 
+      context: ./boldo-web
+      args:
+        - react_app_sockets=http://localhost:8000
+        - react_app_server=http://localhost:8008
+        - react_app_frontend=http://localhost:3000
+    container_name: boldo-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    networks:
+      - boldo-network
+  
+  boldo-server:
+    build: ./boldo-server
+    container_name: boldo-server
+    restart: unless-stopped
+    environment:
+      - SECRET=secure_server_secret  
+      - MONGODB_URI=mongodb://boldo-user:boldo-password@mongodb:27017/boldo
+      - IHUB_ADDRESS=https://sso-test.pti.org.py/api
+      - CLIENT_ADDRESS=http://localhost:3000
+      - KEYCLOAK_ADDRESS=https://sso-test.pti.org.py/auth
+      - BOLDO_CORS=http://localhost:3000 
+    ports:
+      - "8008:8008"
+    networks:
+      - boldo-network
+
+  boldo-socket:
+    build: ./boldo-sockets
+    container_name: boldo-sockets
+    restart: unless-stopped
+    environment:
+      - SECRET=secure_server_secret
+      - PORT=8000
+    ports:
+      - "8000:8000"
+   
+  db:
+    image: mongo:4.4.2
+    container_name: mongodb
+    restart: unless-stopped
+    environment:
+      - BOLDO_USER=boldo-user
+      - BOLDO_PASSWORD=boldo-password
+      - MONGO_INITDB_ROOT_USERNAME=root-user
+      - MONGO_INITDB_ROOT_PASSWORD=root-password
+      - MONGO_INITDB_DATABASE=boldo
+    volumes:
+      - mongodata:/data/db
+      - ./mongo-init:/docker-entrypoint-initdb.d
+    networks:
+      - boldo-network
+
+networks:
+  boldo-network:
+    driver: bridge
+
+volumes:
+  mongodata:
+
