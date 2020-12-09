@@ -5,16 +5,22 @@ services:
     build: 
       context: ./boldo-web
       args:
-        - react_app_sockets=http://localhost:8000
-        - react_app_server=http://localhost:8008
-        - react_app_frontend=http://localhost:3000
+        - sockets_address=http://localhost:8000
+        - app_server=http://localhost:8008
+        - app_frontend=http://localhost:3000
     container_name: boldo-web
     restart: unless-stopped
     ports:
       - "3000:3000"
     networks:
       - boldo-network
-  
+
+  redis:
+    image: redis
+    container_name: redis-db
+    networks:
+      - boldo-network
+
   boldo-server:
     build: ./boldo-server
     container_name: boldo-server
@@ -25,7 +31,7 @@ services:
       - IHUB_ADDRESS=https://sso-test.pti.org.py/api
       - CLIENT_ADDRESS=http://localhost:3000
       - KEYCLOAK_ADDRESS=https://sso-test.pti.org.py/auth
-      - BOLDO_CORS=http://localhost:3000 
+      - REDIS_URL=redis://redis-db:6379
     ports:
       - "8008:8008"
     networks:
