@@ -7,7 +7,6 @@ services:
       args:
         - sockets_address=http://localhost:8000
         - app_server=http://localhost:8008
-        - app_frontend=http://localhost:3000
     container_name: boldo-web
     restart: unless-stopped
     ports:
