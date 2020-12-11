@@ -17,6 +17,7 @@ services:
   redis:
     image: redis
     container_name: redis-db
+    restart: unless-stopped
     networks:
       - boldo-network
 
