@@ -2,40 +2,48 @@ version: '3'
 
 services:
   boldo-web:
-    build: 
+    environment:
+      - REACT_APP_SERVER_ADDRESS=http://localhost:8008
+      - REACT_APP_SOCKETS_ADDRESS=http://localhost:8000
+    build:
       context: ./boldo-web
-      args:
-        - sockets_address=http://localhost:8000
-        - app_server=http://localhost:8008
+      dockerfile: Dockerfile-local
     container_name: boldo-web
     restart: unless-stopped
     ports:
       - "3000:3000"
     networks:
-      - boldo-network
+      - boldo-network-lite
 
   redis:
     image: redis
     container_name: redis-db
     restart: unless-stopped
     networks:
-      - boldo-network
+      - boldo-network-lite
 
   boldo-server:
-    build: ./boldo-server
+    image: node:14.15.1
+    volumes:
+      - "./boldo-server/:/usr/src/app/"
+    command: /bin/sh -c "cd /usr/src/app/ && npm i && npm run build && apt-get update && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && npm start -p 8008"
     container_name: boldo-server
     restart: unless-stopped
     environment:
-      - SECRET=secure_server_secret  
-      - MONGODB_URI=mongodb://boldo-user:boldo-password@mongodb:27017/boldo
-      - IHUB_ADDRESS=https://sso-test.pti.org.py/api
+      - SECRET=secure_server_secret
+      - MONGODB_URI=
+      - IHUB_ADDRESS=
       - CLIENT_ADDRESS=http://localhost:3000
-      - KEYCLOAK_ADDRESS=https://sso-test.pti.org.py/auth
+      - KEYCLOAK_ADDRESS=
       - REDIS_URL=redis://redis-db:6379
+      - TZ=America/Asuncion
+      - PRIVATE_KEY
+      - BOLDO_ADMIN=
+      - BOLDO_PASS=
     ports:
       - "8008:8008"
     networks:
-      - boldo-network
+      - boldo-network-lite
 
   boldo-socket:
     build: ./boldo-sockets
@@ -44,29 +52,10 @@ services:
     environment:
       - SECRET=secure_server_secret
       - PORT=8000
+      - PUBLIC_KEY
     ports:
       - "8000:8000"
-   
-  db:
-    image: mongo:4.4.2
-    container_name: mongodb
-    restart: unless-stopped
-    environment:
-      - BOLDO_USER=boldo-user
-      - BOLDO_PASSWORD=boldo-password
-      - MONGO_INITDB_ROOT_USERNAME=root-user
-      - MONGO_INITDB_ROOT_PASSWORD=root-password
-      - MONGO_INITDB_DATABASE=boldo
-    volumes:
-      - mongodata:/data/db
-      - ./mongo-init:/docker-entrypoint-initdb.d
-    networks:
-      - boldo-network
 
 networks:
-  boldo-network:
-    driver: bridge
-
-volumes:
-  mongodata:
-
+  boldo-network-lite:
+    external: true
