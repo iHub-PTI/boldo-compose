@@ -19,4 +19,3 @@ docker network create boldo-network-lite
 
 
 docker-compose -f docker-compose.yaml up --build --detach
-.cron.sh
