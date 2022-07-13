@@ -1,20 +1,6 @@
 version: '3'
 
 services:
-  boldo-web:
-    environment:
-      - REACT_APP_SERVER_ADDRESS=http://localhost:8008
-      - REACT_APP_SOCKETS_ADDRESS=http://localhost:8000
-    build:
-      context: ./boldo-web
-      dockerfile: Dockerfile-local
-    container_name: boldo-web
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    networks:
-      - boldo-network-lite
-
   redis:
     image: redis
     container_name: redis-db
