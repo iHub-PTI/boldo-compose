@@ -13,6 +13,8 @@ git clone https://github.com/iHub-PTI/boldo-server && cd ./boldo-server && git c
 
 git clone https://github.com/iHub-PTI/boldo-sockets && cd ./boldo-sockets && git checkout $gitBranch && cd ../
 
+git clone https://github.com/iHub-PTI/boldo-web && cd ./boldo-web && git checkout $gitBranch && cd ../
+
 docker network create boldo-network-lite
 
 
