@@ -16,6 +16,9 @@ services:
     environment:
       - REACT_APP_SOCKETS_ADDRESS=http://localhost:8000
       - REACT_APP_SERVER_ADDRESS=http://localhost:8008
+      - REACT_APP_KEYCLOAK_URL=
+      - REACT_APP_KEYCLOAK_CLIENT_ID=
+      - REACT_APP_KEYCLOAK_REALM=
     networks:
       - boldo-network-lite
 
